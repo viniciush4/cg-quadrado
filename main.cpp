@@ -9,9 +9,52 @@ int teclas[256];
 int velocidade;
 Quadrado quadrado;
 
+void calcula_teleporte(){
+	double m = tanf(quadrado.angulo * M_PI / 180);
+	double E = quadrado.y - 0;
+	double A = 1+m*m;
+	double B = -2*0 -2*m*m*quadrado.x + 2*E*m;
+	double C = E*E - 2*E*m*quadrado.x + m*m*quadrado.x*quadrado.x + 0*0 - 200*200;
+
+	double x1 = (-B + sqrt(B*B - 4*A*C))/(2*A);
+	double x2 = (-B - sqrt(B*B - 4*A*C))/(2*A);
+
+	double y1 = quadrado.y + m*(x1-quadrado.x);
+	double y2 = quadrado.y + m*(x2-quadrado.x);
+
+	if(fabs(quadrado.x - x1) < fabs(quadrado.x - x2)){
+		quadrado.x = x2;
+		quadrado.y = y2;
+	}else{
+		quadrado.x = x1;
+		quadrado.y = y1;
+	}
+
+}
+
+void desenharArena(){
+    float theta = 0.0;
+    glColor3f(0, 0, 1);
+	glBegin(GL_POLYGON);
+    for(int i=0; i < 50; i++){
+        glVertex3f(200 * cos(theta), 200 * sin(theta), 0.0);
+        theta += 2*3.1415926f/50;
+    }
+    glEnd();
+}
+
+void verificarColisao(){
+	float distancia = sqrt(pow(quadrado.x,2)+pow(quadrado.y,2));
+	if(distancia > 200){
+		calcula_teleporte();
+	}
+}
+
 void display(void){
 
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	desenharArena();
 
 	quadrado.desenharPreenchido();
 	
@@ -21,6 +64,8 @@ void display(void){
 void idle(void){
 
 	// quadrado.andar(velocidade);
+	
+	verificarColisao();
 
 	if(teclas[0] == 1) {
 		quadrado.moverParaCima(velocidade);
@@ -133,13 +178,13 @@ int main(int argc, char** argv){
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(600, 600);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Quadrado");
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-250, 250, -250, 250, -1.0, 1.0);
+	glOrtho(-300, 300, -300, 300, -1.0, 1.0);
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
 	glutKeyboardFunc(keyPress);
