@@ -8,6 +8,7 @@ using namespace std;
 int teclas[256];
 int velocidade;
 Quadrado quadrado;
+int mouse_ultima_posicao_x = 0;
 
 void calcula_teleporte(){
 	double m = tanf(quadrado.angulo * M_PI / 180);
@@ -64,6 +65,8 @@ void display(void){
 void idle(void){
 
 	// quadrado.andar(velocidade);
+
+	quadrado.girarHelices(velocidade);
 	
 	verificarColisao();
 
@@ -171,10 +174,22 @@ void keyUp(unsigned char key, int x, int y) {
 	}
 }
 
+void passiveMotion(int x, int y){
+
+	cout << x << "  " << mouse_ultima_posicao_x << endl;
+
+	if(x > mouse_ultima_posicao_x)
+		quadrado.alterarAnguloCanhao(-velocidade);
+	if(x < mouse_ultima_posicao_x)
+		quadrado.alterarAnguloCanhao(velocidade);
+	
+	mouse_ultima_posicao_x = x;
+}
+
 int main(int argc, char** argv){
 
 	quadrado = Quadrado();
-	velocidade = 3;
+	velocidade = 10;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -189,6 +204,7 @@ int main(int argc, char** argv){
 	glutIdleFunc(idle);
 	glutKeyboardFunc(keyPress);
 	glutKeyboardUpFunc(keyUp);
+	glutPassiveMotionFunc(passiveMotion);
 	glutMainLoop();
 
 	return 0;

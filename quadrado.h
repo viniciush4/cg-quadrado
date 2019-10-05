@@ -5,6 +5,8 @@ public:
 	float y;
 	float angulo;
 	float escala;
+	float angulo_canhao;
+	float angulo_helices;
 
 	Quadrado();
 
@@ -16,9 +18,11 @@ public:
 	void moverParaDireita(float velocidade);
 
 	void alterarAngulo(float velocidade);
+	void alterarAnguloCanhao(float velocidade);
 	void alterarEscala(float velocidade);
 
 	void andar(float velocidade);
+	void girarHelices(float velocidade);
 	
 	
 	virtual ~Quadrado();
