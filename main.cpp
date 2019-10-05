@@ -1,13 +1,16 @@
 #include <iostream>
 #include <math.h>
 #include "quadrado.h"
+#include "tiro.h"
 #include <GL/glut.h>
+#include <vector>
 
 using namespace std;
 
 int teclas[256];
 int velocidade;
 Quadrado quadrado;
+vector<Tiro> tiros;
 int mouse_ultima_posicao_x = 0;
 
 void calcula_teleporte(){
@@ -44,6 +47,10 @@ void desenharArena(){
     glEnd();
 }
 
+void reiniciarJogo(){
+	quadrado = Quadrado();
+}
+
 void verificarColisao(){
 	float distancia = sqrt(pow(quadrado.x,2)+pow(quadrado.y,2));
 	if(distancia > 200){
@@ -57,6 +64,10 @@ void display(void){
 
 	desenharArena();
 
+	for(int i=0; i < tiros.size(); i++){
+		tiros.at(i).desenharPreenchido();
+	}
+
 	quadrado.desenharPreenchido();
 	
 	glutSwapBuffers();
@@ -67,6 +78,14 @@ void idle(void){
 	// quadrado.andar(velocidade);
 
 	quadrado.girarHelices(velocidade);
+
+	for(int i=0; i < tiros.size(); i++){
+		tiros.at(i).mover(velocidade);
+		float distancia = sqrt(pow(tiros.at(i).x,2)+pow(tiros.at(i).y,2));
+		if(distancia > 200){
+			tiros.erase(tiros.begin()+i);
+		}
+	}
 	
 	verificarColisao();
 
@@ -96,6 +115,9 @@ void idle(void){
 	}
 	if(teclas[8] == 1) {
 		quadrado.andar(velocidade);
+	}
+	if(teclas[9] == 1) {
+		reiniciarJogo();
 	}
 
 	// Marca a janela atual como precisando ser reexibida
@@ -131,6 +153,9 @@ void keyPress(unsigned char key, int x, int y) {
 			break;
 		case 'o':
 			teclas[8] = 1;
+			break;
+		case 'r':
+			teclas[9] = 1;
 			break;
 	
 		default:
@@ -168,6 +193,9 @@ void keyUp(unsigned char key, int x, int y) {
 		case 'o':
 			teclas[8] = 0;
 			break;
+		case 'r':
+			teclas[9] = 0;
+			break;
 	
 		default:
 			break;
@@ -175,9 +203,6 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 void passiveMotion(int x, int y){
-
-	cout << x << "  " << mouse_ultima_posicao_x << endl;
-
 	if(x > mouse_ultima_posicao_x)
 		quadrado.alterarAnguloCanhao(-velocidade);
 	if(x < mouse_ultima_posicao_x)
@@ -186,10 +211,18 @@ void passiveMotion(int x, int y){
 	mouse_ultima_posicao_x = x;
 }
 
+void mouse(int button, int state, int x, int y){
+
+	if(button == 0 && state == 0){
+		Tiro tiro = Tiro(quadrado.x, quadrado.y, quadrado.angulo_canhao_arena);
+		tiros.push_back(tiro);
+	}
+}
+
 int main(int argc, char** argv){
 
 	quadrado = Quadrado();
-	velocidade = 10;
+	velocidade = 3;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -205,6 +238,7 @@ int main(int argc, char** argv){
 	glutKeyboardFunc(keyPress);
 	glutKeyboardUpFunc(keyUp);
 	glutPassiveMotionFunc(passiveMotion);
+	glutMouseFunc(mouse);
 	glutMainLoop();
 
 	return 0;

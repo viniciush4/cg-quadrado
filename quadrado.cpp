@@ -9,9 +9,10 @@ Quadrado::Quadrado(){
 	this->lado = 20;
     this->x = 0;
     this->y = 0;
-    this->angulo = 90;
+    this->angulo = 0;
     this->escala = 1;
     this->angulo_canhao = 0;
+    this->angulo_canhao_arena = 0;
     this->angulo_helices = 0;
 }
 
@@ -123,12 +124,13 @@ void Quadrado::moverParaDireita(float velocidade){
 
 void Quadrado::alterarAngulo(float velocidade){
     this->angulo += velocidade;
+    this->angulo_canhao_arena += velocidade;
 }
 
 void Quadrado::alterarAnguloCanhao(float velocidade){
     if(this->angulo_canhao + velocidade < 45 && this->angulo_canhao + velocidade > -45){
         this->angulo_canhao += velocidade;
-        cout << this->angulo_canhao << endl;
+        this->angulo_canhao_arena += velocidade;
     }
 }
 

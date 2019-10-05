@@ -6,6 +6,7 @@ public:
 	float angulo;
 	float escala;
 	float angulo_canhao;
+	float angulo_canhao_arena;
 	float angulo_helices;
 
 	Quadrado();
